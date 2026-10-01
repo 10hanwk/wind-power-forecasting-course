@@ -132,15 +132,13 @@ def escape_table_cell(value: object) -> str:
 
 def submission_comment(record: dict) -> str:
     marker = encode_submission_marker(record)
-    pr_number = record["pr_number"]
-    pr_url = f"https://github.com/{REPOSITORY}/pull/{pr_number}"
 
     return f"""{marker}
 ### 채점 완료 ✅
 
-| 제출시각 | 이름 | 모델명 | NMAE | PR |
-| --- | --- | --- | ---: | --- |
-| {escape_table_cell(record["graded_at"])} | {escape_table_cell(record["name"])} | {escape_table_cell(record["model_name"])} | **{record["nmae"]:.4f}%** | [#{pr_number}]({pr_url}) |
+| 제출시각 | 이름 | 모델명 | NMAE |
+| --- | --- | --- | ---: |
+| {escape_table_cell(record["graded_at"])} | {escape_table_cell(record["name"])} | {escape_table_cell(record["model_name"])} | **{record["nmae"]:.4f}%** |
 """
 
 
@@ -219,6 +217,8 @@ def render_leaderboard(records: list[dict]) -> str:
         "",
         "자동 채점이 완료된 제출 결과입니다. **NMAE는 낮을수록 좋습니다.**",
         "",
+        "> 제출 파일의 직접 접근을 줄이기 위해 Leaderboard에는 Pull Request 링크를 표시하지 않습니다.",
+        "",
         "## Best Leaderboard",
         "",
     ]
@@ -244,20 +244,18 @@ def render_leaderboard(records: list[dict]) -> str:
     if history:
         lines.extend(
             [
-                "| 제출시각 | 이름 | 모델명 | NMAE | PR |",
-                "| --- | --- | --- | ---: | --- |",
+                "| 제출시각 | 이름 | 모델명 | NMAE |",
+                "| --- | --- | --- | ---: |",
             ]
         )
 
         rendered_history: list[str] = []
         for record in history:
-            pr_number = record["pr_number"]
-            pr_url = f"https://github.com/{REPOSITORY}/pull/{pr_number}"
             rendered_history.append(
                 f"| {escape_table_cell(record['graded_at'])} | "
                 f"{escape_table_cell(record['name'])} | "
                 f"{escape_table_cell(record['model_name'])} | "
-                f"{record['nmae']:.4f}% | [#{pr_number}]({pr_url}) |"
+                f"{record['nmae']:.4f}% |"
             )
 
         for row in rendered_history:
